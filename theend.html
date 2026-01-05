@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Illegal Sailors - The End</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script defer src="game.js"></script>
+</head>
+<body>
+
+<div class="viewport">
+  <div class="bgOverlay" style="background:rgba(0,0,0,0.55);"></div>
+
+  <div class="centerStack">
+    <div class="stack">
+      <h1 class="title">The End</h1>
+      <p class="text">You made it. Norway will remember you… probably not for the right reasons.</p>
+      <a class="btn" href="index.html" id="playAgain">Play Again</a>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.getElementById("playAgain").addEventListener("click", ()=>{
+    GAME.resetGame();
+  });
+</script>
+
+</body>
+</html>
