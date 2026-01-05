@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Illegal Sailors - Ozobot & Rules</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script defer src="game.js"></script>
+</head>
+<body class="ozobody">
+
+  <nav class="ozonav">
+    <a href="#rules">Rules</a>
+    <a href="#ozobot">Ozobot</a>
+  </nav>
+
+  <div class="ozosection" id="rules">
+    <h2>Rules</h2>
+
+    <h3>1) Objective</h3>
+    <p>The player must leave the starting point, reach Norway, and return to the start.</p>
+    <p><b>You win by completing the round trip without running out of squares.</b></p>
+
+    <h3>2) Main Resource: “Squares” (fuel / distance)</h3>
+    <p>Every movement costs squares:</p>
+    <ul>
+      <li>Each grid square traveled = -1 square from your counter.</li>
+      <li>
+        The player must
+        <a href="#squareCounter" id="subtractLink" style="font-weight:900; color:#A100C9; text-decoration:underline;">
+          subtract the number of squares
+        </a>
+        they use on the board.
+      </li>
+      <li>1 square = 55 mm</li>
+      <li>If your counter reaches 0, you lose immediately (out of fuel).</li>
+    </ul>
+
+    <h3>3) Boat Movement (Ozobot)</h3>
+    <ul>
+      <li>The boat can move freely on the board (no fixed route).</li>
+      <li>The player may change direction anytime (turn left/right, etc.).</li>
+      <li><b>Golden rule:</b> no free moves — if you moved, you spent squares.</li>
+    </ul>
+
+    <h3>4) Checkpoints (refuel by answering Coast Guard questions)</h3>
+    <ul>
+      <li>There are multiple checkpoints on the board.</li>
+      <li>Checkpoints must be visited in the correct order.</li>
+      <li>A checkpoint can only be used when the Coast Guard boat is there.</li>
+      <li>If the player reaches a checkpoint and the Coast Guard boat (purple boat) isn’t present, nothing happens.</li>
+      <li><b>How to earn squares at a checkpoint:</b> When you reach a valid checkpoint go to the “Marine Guard” button to get squares.</li>
+    </ul>
+
+    <h3>5) Pollution Zones</h3>
+    <p>It's not mandatory to go to these areas.</p>
+    <ul>
+      <li>Certain areas are marked as pollution zones.</li>
+      <li>Every time the boat enters a pollution zone, the player must guess what type of marine pollution they have encountered and answer a question about that polluted area.</li>
+      <li><b>Outcome:</b></li>
+      <li>If correct: continue normally, no penalty.</li>
+      <li>If wrong: lose 2 squares.</li>
+    </ul>
+
+    <h3>7) Win Condition</h3>
+    <ul>
+      <li>Reach Norway, then</li>
+      <li>Return to the starting point</li>
+      <li>With at least 1 square left in the counter.</li>
+    </ul>
+
+    <h3>8) Lose Condition</h3>
+    <p>The player loses if the square counter hits 0 at any time.</p>
+  </div>
+
+  <div class="ozosection" id="ozobot">
+    <h2>Ozobot</h2>
+
+    <p>To use your Ozobot, simply connect it to a computer via USB or program it using “flashing.”</p>
+
+    <h3>Via USB</h3>
+    <p>To download via USB, you must:</p>
+
+    <p><b>1)</b> Connect your Ozobot to your PC with a USB cable. Make sure the connector matches the shape shown in Fig. 1.</p>
+    <div class="imgBlock"><img src="USBentery.jpg" alt="USB entry"></div>
+
+    <p><b>2)</b> Check if the model selected in Ozoblockly is “Bit+/Bit”. If it isn’t, you can change it by clicking “Bit+/Bit”.</p>
+    <div class="imgBlock"><img src="bitBit.png" alt="Bit+/Bit"></div>
+
+    <p><b>3)</b> Go to “Programs” and click “Connect”.</p>
+    <div class="imgBlock"><img src="Program.png" alt="Programs"></div>
+    <div class="imgBlock"><img src="Connect.png" alt="Connect"></div>
+
+    <p><b>4)</b> Then, in the pop-up window, select your Ozobot and click “Connect”. <b>(Pop-up windows do not work on Firefox and Safari.)</b></p>
+    <div class="imgBlock"><img src="popupwindow.png" alt="Popup window"></div>
+
+    <p><b>5)</b> Then click “Load Program” and your Ozobot is ready to use. Press the Ozobot button twice to run your program.</p>
+    <div class="imgBlock"><img src="LoadProgram.png" alt="Load program"></div>
+
+    <h3>Flashing</h3>
+    <p>When you open Ozoblockly, click “Flashing” and follow the on-screen instructions to download the program.</p>
+    <div class="imgBlock"><img src="Flashing.png" alt="Flashing"></div>
+    <div class="imgBlock"><img src="FlashingTuturial.png" alt="Flashing tutorial"></div>
+
+    <p><b>USB is the preferred method.</b></p>
+  </div>
+
+  <!-- Squares counter (sticky bottom) -->
+  <div class="squaresBar" id="squareCounter">
+    <div class="chip">Squares: <span id="sqNow">0</span></div>
+
+    <input id="spentInput" type="number" min="0" step="1" placeholder="Squares spent…" />
+    <button class="btn" id="applySpent" style="border-color:rgba(161,0,201,0.35);">Subtract</button>
+
+   </div>
+
+
+<script>
+  const sqNow = document.getElementById("sqNow");
+  const spentInput = document.getElementById("spentInput");
+  const applySpent = document.getElementById("applySpent");
+  const subtractLink = document.getElementById("subtractLink");
+
+  function render(){
+    sqNow.textContent = String(GAME.getSquares());
+  }
+
+  applySpent.addEventListener("click", ()=>{
+    const v = Number(spentInput.value);
+    if(Number.isFinite(v) && v > 0){
+      GAME.addSquares(-Math.floor(v));
+      spentInput.value = "";
+      render();
+    }
+  });
+
+  spentInput.addEventListener("keydown", (e)=>{
+    if(e.key === "Enter") applySpent.click();
+  });
+
+  subtractLink.addEventListener("click", ()=>{
+    setTimeout(()=> spentInput.focus(), 150);
+  });
+
+  window.addEventListener("storage", (ev)=>{
+    if(ev.key === GAME.keys.squares) render();
+  });
+
+  document.addEventListener("DOMContentLoaded", render);
+</script>
+
+
+</body>
+</html>

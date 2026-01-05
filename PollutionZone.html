@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Illegal Sailors - Pollution Zone</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script defer src="game.js"></script>
+</head>
+
+<body>
+  <div class="viewport" id="pzRoot">
+    <video class="bgVideo" src="nomedovideo.mp4" autoplay muted loop playsinline></video>
+    <div class="bgOverlay" style="background:rgba(0,0,0,0.32);"></div>
+
+    <div class="centerStack">
+      <!-- INTRO: shows the random description -->
+      <div class="stack" id="stageIntro">
+        <p
+          id="zoneDesc"
+          class="text noBgText"
+          style="color:#C5E8D5; font-size:clamp(16px,2.5vw,22px);"
+        >
+          <!-- set by JS -->
+        </p>
+        <button class="btn" id="introContinue">Continue</button>
+      </div>
+
+      <!-- PICK: user must match the description -->
+      <div class="stack" id="stagePick" style="display:none;">
+        <h2 class="questionBox" id="pickQuestion">What type of marine pollution is this?</h2>
+
+        <!-- Try again message -->
+        <p
+          id="tryAgain"
+          class="text noBgText"
+          style="display:none; margin-top:8px; color:#C5E8D5; font-weight:900;"
+        >
+          Try again...
+        </p>
+
+        <div class="choiceGrid">
+          <div class="choiceTile" data-type="chemical" role="button" tabindex="0">
+            <img src="ChemicalPollution.png" alt="Chemical Pollution" />
+            <div class="tileText">Chemical Pollution</div>
+          </div>
+
+          <div class="choiceTile" data-type="litter" role="button" tabindex="0">
+            <img src="MarinelitterPollution.png" alt="Marine Litter Pollution" />
+            <div class="tileText">Marine Litter Pollution</div>
+          </div>
+
+          <div class="choiceTile" data-type="oil" role="button" tabindex="0">
+            <img src="OilspillPollution.jpg" alt="Oil Spill Pollution" />
+            <div class="tileText">Oil Spill Pollution</div>
+          </div>
+        </div>
+
+        <p class="pill" style="background:transparent;">
+          (Choose the option that matches the description.)
+        </p>
+      </div>
+
+      <!-- QUIZ -->
+      <div class="stack" id="stageQuiz" style="display:none;">
+        <img
+          id="scenarioImg"
+          src=""
+          alt="Scenario"
+          style="width:min(520px, 86vw); border-radius:14px; border:2px solid rgba(255,255,255,0.18);"
+        />
+
+        <h2 class="questionBox" id="scenarioQuestion">Question</h2>
+
+        <div class="mcq" id="mcq"></div>
+
+        <div
+          class="text"
+          id="resultBox"
+          style="display:none; text-align:left; background:rgba(0,0,0,0.40);"
+        ></div>
+
+        <button class="btn" id="endBtn" style="align-self:flex-end; margin-top:6px;">End</button>
+      </div>
+    </div>
+  </div>
+
+  
+<script>
+  const SCENARIOS = {
+    chemical: {
+      title: "Chemical pollution",
+      img: "ChemicalPollution.png",
+      question:
+        "During an oil spill, some oil fractions naturally disperse while others persist on the surface. Considering short- and long-term impacts, which integrated strategy is most environmentally effective?",
+      answers: [
+        { id: "a", text: "Apply chemical dispersants across the entire spill, even in sensitive coastal areas", correct: false },
+        { id: "b", text: "Combine physical barriers, localized containment, mechanical recovery, and rigorous monitoring of affected wildlife", correct: true },
+        { id: "c", text: "Let the oil degrade naturally, accelerating biodegradation with large-scale chemical fertilizers", correct: false },
+        { id: "d", text: "Reduce fishing activity as the only preventive measure", correct: false }
+      ],
+      explanation:
+        "Oil spills have short- and long-term environmental effects. An integrated response that includes booms, skimmers, localized containment, and wildlife monitoring is the most effective way to reduce immediate damage and long-term ecological consequences. Using chemical dispersants indiscriminately or relying solely on natural degradation can worsen environmental impacts, especially in sensitive coastal habitats."
+    },
+
+    litter: {
+      title: "Marine litter pollution",
+      img: "MarinelitterPollution.png",
+      question:
+        "Besides primary plastics, microplastics also originate from larger plastics that degrade. What is the most serious ecological consequence of this process in the marine food chain?",
+      answers: [
+        { id: "a", text: "Increased primary productivity due to nutrient absorption by plastics", correct: false },
+        { id: "b", text: "Bioaccumulation of plastic particles and chemical contaminants in fish and predators", correct: true },
+        { id: "c", text: "Neutralization of toxins in water by degraded plastics", correct: false },
+        { id: "d", text: "Improved oxygenation in coastal zones", correct: false }
+      ],
+      explanation:
+        "Microplastics act as vectors for pollutants such as persistent organic pollutants (POPs) and heavy metals. Small marine organisms ingest these microplastics, and these contaminants accumulate in their tissues. As predators consume these organisms, the pollutants biomagnify up the food chain, affecting fish, marine mammals, and even humans. Preventing microplastic pollution is critical because mechanical removal or natural degradation alone cannot stop this process."
+    },
+
+    oil: {
+      title: "Oil spill pollution",
+      img: "OilspillPollution.jpg",
+      question:
+        "Heavy metals and persistent organic pollutants can interact with marine sediments. What is the main implication of this interaction for benthic species and food chain transfer?",
+      answers: [
+        { id: "a", text: "Sediments neutralize pollutants, making them harmless", correct: false },
+        { id: "b", text: "Pollutants adhered to sediments are incorporated by benthic organisms, entering the food chain and causing bioaccumulation and biomagnification", correct: true },
+        { id: "c", text: "Only top predators are affected, while smaller organisms remain safe", correct: false },
+        { id: "d", text: "Pollutants in sediments do not interact with the environment, remaining stable and isolated", correct: false }
+      ],
+      explanation:
+        "Heavy metals and persistent organic pollutants often adsorb to sediments, creating a reservoir of toxins in the benthic environment. Bottom-dwelling species ingest contaminated sediments or prey, which leads to bioaccumulation in their tissues. These pollutants then move up the food chain, affecting larger predators and potentially humans. Mitigating this issue requires controlling pollutant inputs at the source rather than relying on natural sediment interactions."
+    }
+  };
+
+  // Descriptions (one is chosen at random when you enter)
+  const DESCRIPTIONS = {
+    chemical: "An old, rusty pipe reaches into the sea, leaking strange green foam that spreads on the surface.",
+    litter: "Near the shore, bits of rubbish and plastic drift together, forming a dirty patch that won’t go away.",
+    oil: "From above, a ship moves through calm water… but a large dark mark follows behind it like a shadow."
+  };
+
+  const introContinue = document.getElementById("introContinue");
+  const stageIntro = document.getElementById("stageIntro");
+  const stagePick  = document.getElementById("stagePick");
+  const stageQuiz  = document.getElementById("stageQuiz");
+
+  const zoneDesc = document.getElementById("zoneDesc");
+  const pickQuestion = document.getElementById("pickQuestion");
+
+  const scenarioImg = document.getElementById("scenarioImg");
+  const scenarioQuestion = document.getElementById("scenarioQuestion");
+  const mcq = document.getElementById("mcq");
+  const resultBox = document.getElementById("resultBox");
+  const endBtn = document.getElementById("endBtn");
+
+  // Pick which polluted zone you "entered"
+  const TYPES = ["chemical","litter","oil"];
+  const targetType = TYPES[Math.floor(Math.random() * TYPES.length)];
+  zoneDesc.textContent = DESCRIPTIONS[targetType];
+
+  introContinue.addEventListener("click", ()=>{
+    stageIntro.style.display = "none";
+    stagePick.style.display = "";
+  });
+
+  function showTryAgain(){
+    pickQuestion.textContent = "Try again...";
+    setTimeout(()=> pickQuestion.textContent = "What type of marine pollution is this?", 900);
+  }
+
+  function startScenario(typeKey){
+    if(typeKey !== targetType){
+      showTryAgain();
+      return;
+    }
+
+    const s = SCENARIOS[typeKey];
+
+    stagePick.style.display = "none";
+    stageQuiz.style.display = "";
+
+    scenarioImg.src = s.img;
+    scenarioImg.alt = s.title;
+    scenarioQuestion.textContent = s.question;
+
+    mcq.innerHTML = "";
+    resultBox.style.display = "none";
+    resultBox.innerHTML = "";
+
+    s.answers.forEach(ans=>{
+      const b = document.createElement("button");
+      b.type = "button";
+      b.textContent = `${ans.id.toUpperCase()}) ${ans.text}`;
+      b.addEventListener("click", ()=> onAnswer(typeKey, ans.id));
+      mcq.appendChild(b);
+    });
+  }
+
+  function onAnswer(typeKey, answerId){
+    const s = SCENARIOS[typeKey];
+    const picked = s.answers.find(a=>a.id===answerId);
+    const correct = s.answers.find(a=>a.correct===true);
+
+    // ✅ esconder pergunta + escolhas
+    scenarioQuestion.style.display = "none";
+    mcq.style.display = "none";
+
+    // ✅ mostrar resultado/justificação
+    resultBox.style.display = "";
+    resultBox.innerHTML = "";
+
+    if(picked.correct){
+      resultBox.innerHTML += `<div style="font-weight:900; margin-bottom:8px;">
+        Correct! You have passed this polluted area!
+      </div>`;
+    }else{
+      GAME.addSquares(-2);
+      resultBox.innerHTML += `<div style="font-weight:900; margin-bottom:8px;">
+        Wrong answer…(-2 squares)
+      </div>`;
+    }
+
+    resultBox.innerHTML += `<div style="margin-bottom:8px;">
+      <b>Correct answer:</b> ${correct.id.toUpperCase()}) ${correct.text}
+    </div>`;
+
+    resultBox.innerHTML += `<div>
+      <b>Explanation:</b> ${s.explanation}
+    </div>`;
+  }
+
+  document.querySelectorAll(".choiceTile").forEach(tile=>{
+    tile.addEventListener("click", ()=>{
+      const type = tile.getAttribute("data-type");
+      startScenario(type);
+    });
+    tile.addEventListener("keydown", (e)=>{
+      if(e.key === "Enter" || e.key === " "){
+        e.preventDefault();
+        tile.click();
+      }
+    });
+  });
+
+  endBtn.addEventListener("click", ()=>{
+    window.close();
+    setTimeout(()=>{ window.location.href = "questions.html"; }, 150);
+  });
+</script>
+
+</body>
+</html>
