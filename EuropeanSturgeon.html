@@ -1,0 +1,391 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Illegal Sailors - European Sturgeon</title>
+
+  <link rel="stylesheet" href="styles.css" />
+  <script defer src="game.js"></script>
+
+  <style>
+    :root{
+      --stg-popup-bg:#C5E8D5;
+      --stg-text:#000;
+    }
+
+    .stg-storm-btn{
+      position:absolute;
+      border:0;
+      padding:0;
+      background:transparent;
+      cursor:pointer;
+      transition: transform .15s ease;
+      border-radius: 16px;
+      overflow:hidden;
+    }
+    .stg-storm-btn:hover{ transform: scale(1.03); }
+    .stg-storm-btn:active{ transform: scale(.98); }
+    .stg-storm-btn img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+    }
+
+    .stg-overlay{
+      position:absolute;
+      inset:0;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      background: rgba(0,0,0,.55);
+      padding: 18px;
+      z-index: 20;
+    }
+    .stg-overlay.show{ display:flex; }
+
+    .stg-modal{
+      width:min(620px, 95%);
+      background: var(--stg-popup-bg);
+      color: var(--stg-text);
+      border-radius: 18px;
+      padding: 18px 18px 16px;
+      box-shadow: 0 18px 60px rgba(0,0,0,.45);
+      position: relative;
+      font-family: "American Typewriter", serif;
+    }
+
+    .stg-topline{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+      font-weight: 900;
+    }
+    .stg-badge{
+      font-size: 12px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(0,0,0,.10);
+      border: 1px solid rgba(0,0,0,.18);
+      font-weight: 800;
+    }
+
+    .stg-bubble{
+      background: rgba(255,255,255,.55);
+      border: 2px solid rgba(0,0,0,.35);
+      border-radius: 18px;
+      padding: 14px 14px 12px;
+      position: relative;
+    }
+    .stg-bubble:after{
+      content:"";
+      position:absolute;
+      left: 34px;
+      bottom: -14px;
+      width: 0;
+      height: 0;
+      border: 14px solid transparent;
+      border-top-color: rgba(0,0,0,.35);
+      filter: drop-shadow(0 6px 8px rgba(0,0,0,.12));
+    }
+    .stg-bubble:before{
+      content:"";
+      position:absolute;
+      left: 36px;
+      bottom: -12px;
+      width: 0;
+      height: 0;
+      border: 12px solid transparent;
+      border-top-color: rgba(255,255,255,.55);
+    }
+
+    .stg-qtext{
+      font-size: 18px;
+      line-height: 1.25;
+      margin: 6px 0 12px;
+      font-weight: 900;
+      color: #000;
+      background: transparent;
+      text-align:left;
+    }
+
+    .stg-options{
+      display:grid;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .stg-opt{
+      border: 0;
+      border-radius: 12px;
+      padding: 12px 12px;
+      background: rgba(0,0,0,.08);
+      color: var(--stg-text);
+      cursor:pointer;
+      text-align:left;
+      font-size: 15px;
+      font-weight: 800;
+      transition: transform .08s ease, background .15s ease;
+      font-family: "American Typewriter", serif;
+    }
+    .stg-opt:hover{ background: rgba(0,0,0,.12); }
+    .stg-opt:active{ transform: scale(.99); }
+
+    .stg-feedback{
+      margin-top: 10px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: rgba(0,0,0,.08);
+      font-weight: 900;
+      display:none;
+    }
+
+    .stg-hint{
+      margin-top: 10px;
+      font-size: 13px;
+      opacity:.9;
+      font-weight: 700;
+      text-align:left;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="viewport" id="esRoot" style="position:relative;">
+
+  <!-- Stage 1: Encontro (vídeo) -->
+  <div class="viewport" id="stageCanva" style="position:absolute; inset:0; z-index:5;">
+    <video
+      id="encounterVideo"
+      src="fhisermanencouter.mp4"
+      style="position:absolute; inset:0; width:100%; height:100%; object-fit:contain; background:#000;"
+      autoplay
+      muted
+      loop
+      playsinline
+    ></video>
+
+    <div style="position:absolute; left:50%; bottom:14px; transform:translateX(-50%); z-index:6;">
+      <button class="btn" id="canvaContinue">Continue</button>
+    </div>
+  </div>
+
+  <!-- Stage 2: Objective -->
+  <div class="viewport" id="stageObjective" style="display:none; position:absolute; inset:0; z-index:4;">
+    <img class="bgImage" src="newObjective.png" alt="New objective" />
+
+    <button
+      id="stormBtn"
+      class="stg-storm-btn"
+      style="left:40%; top:60%; width:190px; height:190px; z-index:10;"
+      aria-label="Start storm video"
+    >
+      <img src="storm.jpg" alt="Storm" />
+    </button>
+  </div>
+
+  <!-- Stage 3: Tempestade (vídeo + quiz) -->
+  <div class="viewport" id="stageStorm" style="display:none; position:absolute; inset:0; z-index:3;">
+    <video id="stormVideo" class="bgVideo" preload="auto" muted playsinline>
+      <source src="barco_tempestade_final.mp4" type="video/mp4">
+      Your browser does not support video.
+    </video>
+
+    <div class="bgOverlay" style="background:rgba(0,0,0,0.05);"></div>
+
+    <div class="stg-overlay" id="quizOverlay" role="dialog" aria-modal="true">
+      <div class="stg-modal">
+        <div class="stg-topline">
+          <div>Quiz</div>
+          <div class="stg-badge" id="progressBadge">Question 1/3</div>
+        </div>
+
+        <div class="stg-bubble">
+          <div class="stg-qtext" id="qText">…</div>
+          <div class="stg-options" id="options"></div>
+          <div class="stg-feedback" id="feedback"></div>
+          <div class="stg-hint">Click an answer to continue.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stage 4: Código -->
+  <div class="viewport" id="stageCode" style="display:none; position:absolute; inset:0; z-index:2;">
+    <img class="bgImage" src="pedidodepeixe.png" alt="Fish request" />
+    <div class="bgOverlay" style="background:rgba(0,0,0,0.18);"></div>
+
+    <div class="centerStack">
+      <div class="stack">
+        <p class="text" style="background:rgba(0,0,0,0.55);">
+          Hey, did you catch the fish? (Type in the code below the fish.)
+        </p>
+        <input id="codeInput" type="text" placeholder="Enter code"
+          style="font-family:inherit; font-size:18px; padding:10px 12px; border-radius:12px; border:2px solid rgba(255,255,255,0.25); width:min(340px, 84vw);" />
+        <button class="btn" id="checkCode">Check</button>
+        <p class="text" id="codeMsg" style="display:none; background:rgba(49,78,125,0.85);"></p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const stageCanva = document.getElementById("stageCanva");
+  const stageObjective = document.getElementById("stageObjective");
+  const stageStorm = document.getElementById("stageStorm");
+  const stageCode = document.getElementById("stageCode");
+
+  document.getElementById("canvaContinue").addEventListener("click", ()=>{
+    stageCanva.style.display = "none";
+    stageObjective.style.display = "";
+  });
+
+  // Ajusta estes segundos para bater certo com o teu vídeo
+  const STOPS = [5, 10, 15];
+
+  const QUIZ = [
+    {
+      question: "Which explanation best matches why the European sturgeon is critically endangered and slow to recover?",
+      options: [
+        "A) It reproduces frequently, but predators eat most juveniles",
+        "B) It matures late, spawns infrequently, and depends on specific river habitats",
+        "C) It lives only in deep ocean waters with limited food",
+        "D) It cannot tolerate changes in water temperature"
+      ],
+      correctIndex: 1
+    },
+    {
+      question: "How do dams and river engineering most strongly contribute to extinction risk?",
+      options: [
+        "A) They increase river salinity and cause sturgeons to migrate to lakes",
+        "B) They block access to spawning grounds and change flow/sediment needed for eggs",
+        "C) They make fish grow faster but live shorter lives",
+        "D) They reduce sunlight, so eggs cannot hatch"
+      ],
+      correctIndex: 1
+    },
+    {
+      question: "Which conservation strategy is most likely to create a self-sustaining population (not just “more fish released”)?",
+      options: [
+        "A) Release captive-bred juveniles without changing river conditions",
+        "B) Focus only on ocean protection because spawning happens at sea",
+        "C) Restore river connectivity + protect spawning habitat + reduce bycatch/illegal fishing",
+        "D) Increase fishing quotas to fund conservation projects"
+      ],
+      correctIndex: 2
+    }
+  ];
+
+  const stormBtn = document.getElementById("stormBtn");
+  const stormVideo = document.getElementById("stormVideo");
+  const quizOverlay = document.getElementById("quizOverlay");
+  const qText = document.getElementById("qText");
+  const optionsEl = document.getElementById("options");
+  const feedback = document.getElementById("feedback");
+  const progressBadge = document.getElementById("progressBadge");
+
+  let stopIndex = 0;
+  let modalOpen = false;
+  let started = false;
+
+  function openQuiz(){
+    modalOpen = true;
+    quizOverlay.classList.add("show");
+    feedback.style.display = "none";
+    feedback.textContent = "";
+
+    const q = QUIZ[stopIndex];
+    progressBadge.textContent = `Question ${stopIndex+1}/${QUIZ.length}`;
+    qText.textContent = q.question;
+
+    optionsEl.innerHTML = "";
+    q.options.forEach((opt, idx) => {
+      const b = document.createElement("button");
+      b.className = "stg-opt";
+      b.type = "button";
+      b.textContent = opt;
+      b.addEventListener("click", () => handleAnswer(idx));
+      optionsEl.appendChild(b);
+    });
+  }
+
+  function closeQuiz(){
+    modalOpen = false;
+    quizOverlay.classList.remove("show");
+  }
+
+  function handleAnswer(chosenIndex){
+    const q = QUIZ[stopIndex];
+    const correct = chosenIndex === q.correctIndex;
+
+    feedback.style.display = "block";
+    feedback.textContent = correct
+      ? "Correct! Continuing…"
+      : "Wrong! Going back to the previous question…";
+
+    setTimeout(() => {
+      closeQuiz();
+
+      if (correct){
+        stopIndex++;
+        stormVideo.play();
+      } else {
+        stopIndex = Math.max(0, stopIndex - 1);
+        const backTo = (stopIndex === 0) ? 0 : Math.max(0, STOPS[stopIndex] - 0.12);
+        stormVideo.currentTime = backTo;
+        stormVideo.play();
+      }
+    }, 650);
+  }
+
+  function onTimeUpdate(){
+    if (!started || modalOpen) return;
+    if (stopIndex >= STOPS.length) return;
+
+    const target = STOPS[stopIndex];
+    if (stormVideo.currentTime >= target - 0.08){
+      stormVideo.pause();
+      openQuiz();
+    }
+  }
+
+  stormBtn.addEventListener("click", ()=>{
+    stageObjective.style.display = "none";
+    stageStorm.style.display = "";
+
+    started = true;
+    stopIndex = 0;
+    stormVideo.currentTime = 0;
+    stormVideo.play();
+  });
+
+  stormVideo.addEventListener("timeupdate", onTimeUpdate);
+
+  stormVideo.addEventListener("ended", ()=>{
+    // Só desbloqueia o "The End" depois de o código certo ser inserido.
+    // localStorage.setItem("sturgeon_done", "true");
+    stageStorm.style.display = "none";
+    stageCode.style.display = "";
+  });
+
+  document.getElementById("checkCode").addEventListener("click", ()=>{
+    const val = document.getElementById("codeInput").value.trim();
+    const msg = document.getElementById("codeMsg");
+    msg.style.display = "";
+    if(val === "49k0u"){
+      msg.textContent = "Alright, you can move on… but I’ve got my eye on you.";
+      localStorage.setItem("sturgeon_done","true");
+      localStorage.setItem("end_unlocked","true");
+    }else{
+      msg.textContent = "Nope. Try again.";
+    }
+  });
+</script>
+
+</body>
+</html>
