@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Illegal Sailors - The End</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script defer src="game.js"></script>
+</head>
+<body>
+
+<div class="viewport">
+  <!-- Video background (plays first) -->
+  <video id="endVideo" class="bgVideo" src="theend.mp4" autoplay muted playsinline></video>
+
+  <!-- Dark overlay for readability (hidden until video ends) -->
+  <div id="endOverlay" class="bgOverlay" style="background:rgba(0,0,0,0.55); display:none;"></div>
+
+  <!-- Content (hidden until video ends) -->
+  <div class="centerStack" id="endContent" style="display:none;">
+    <div class="stack">
+      <h1 class="title">The End</h1>
+      <a class="btn" href="index.html" id="playAgain">Play Again</a>
+      <script>
+        document.getElementById("playAgain").addEventListener("click", (e)=>{
+          e.preventDefault();
+          GAME.resetGame();
+          window.location.href = "index.html";
+        });
+      </script>
+    </div>
+  </div>
+</div>
+
+
+<script>
+  const vid = document.getElementById("endVideo");
+  const overlay = document.getElementById("endOverlay");
+  const content = document.getElementById("endContent");
+
+  function showEndUI(){
+    overlay.style.display = "";
+    content.style.display = "";
+  }
+
+  // Mostra os botões quando o vídeo acabar
+  vid.addEventListener("ended", showEndUI);
+
+  // Se o vídeo falhar o autoplay (alguns browsers), mostra logo a UI
+  vid.addEventListener("error", showEndUI);
+
+  document.getElementById("playAgain").addEventListener("click", ()=>{
+    if (window.GAME && typeof GAME.resetGame === "function") {
+      GAME.resetGame();
+    }
+  });
+</script>
+
+</body>
+</html>
