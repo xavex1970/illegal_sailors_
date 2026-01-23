@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Illegal Sailors - Ozobot & Rules</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script defer src="game.js"></script>
+</head>
+<body class="ozobody">
+
+  <nav class="ozonav">
+    <a href="#rules">Rules</a>
+    <a href="#ozobot">Ozobot</a>
+  </nav>
+
+  <div class="ozosection" id="rules">
+    <h2>Rules</h2>
+
+    <h3>1) Objective</h3>
+    <p>The player must start at the starting point, reach Norway, and return again to the starting point.</p>
+    <p><b>The player wins by completing the round trip without running out of squares.</b></p>
+
+    <h3>2) Main Resource: “Squares” (fuel / distance)</h3>
+    <p>The player can move the ozobot freely on the board and change direction anytime but every time the player moves a square the boat fuels reduces:</p>
+    <ul>
+      <li>
+        Each time the boat moves a number of squares the player has to discount on
+        <a href="#squareCounter" id="subtractLink" style="font-weight:900; color:#A100C9; text-decoration:underline;">
+          the square counter
+        </a>
+        .
+      </li>
+      <li>1 square = 55 mm</li>
+      <li>If the player counter reaches 0, the player loses immediately (out of fuel).</li>
+    </ul>
+
+    <h3>3)Checkpoints (refuel by answering Coast Guard questions)</h3>
+    <ul>
+      <li>There are multiple checkpoints on the board which must be visited in the correct order.</li>
+      <li>The checkpoints are marked with numbers in the order the player must follow:</li>
+      <ul>
+        <li>The first checkpoint the player must go to is the one marked “1”, then “2”, and then “3.</li>
+        <li>After reaching checkpoint “3”, they must go back to checkpoint “1”.</li>
+        <li>Players must visit checkpoints in order. For example, if the last checkpoint was “1”, they cannot return to “1” or go to “3”; they must go to “2” next.</li>
+      </ul>
+      <li>The player must place the purple boat on the next checkpoint they are allowed to visit. (Note: The purple boat is a marker used to show which checkpoint the player can go to next.)</li>
+      <li><b>How to earn squares at a checkpoint</b></li>
+      <li>When the player reaches a valid checkpoint, press the “Marine Guard” button to get squares (see point 4 “Marine Guard”).</li>
+    </ul>
+
+    <h3>4) Questions</h3>
+    <ul>
+      <li><b>Marine guard</b></li>
+      <ul>
+        <li>Each time the boat enters a checkpoint, go to <a href="questions.html">“Questions”</a> and then click the “Marine Guard” button</li>
+        <li>The player has 2 minutes to answer each question correctly.</li>
+        <li>Each correct answer gives 0.5 squares.</li>
+        <li>Two correct answers equal 1 square. If the player ends with an odd number of correct answers, the last half square is lost because the total is rounded down. Example: If the player answers 5 questions correctly, the player earns 2.5 squares, but the game rounds down to 2 squares (the player loses the last 0.5)</li>
+        <li>There is no limit to the number of questions at each checkpoint.</li>
+      </ul>
+    </ul>
+
+    <ul>
+      <li><b>Pollution zone</b></li>
+      <ul>
+        <li>Each time the boat enters a pollution zone, go to <a href="questions.html">“Questions”</a> and then click the “Pollution Zone” button</li>
+        <li>If the player answers correctly, they continue normally; if they answer incorrectly, they lose 2 squares.</li>
+      </ul>
+    </ul>
+
+    <ul>
+      <li><b>European sturgeon</b></li>
+      <ul>
+        <li>When the boat enters Norway, go to <a href="">“Questions”</a> and then click the “European Sturgeon” button.</li>
+        <li>Follow the instructions.</li>
+        <li><i>Bon voyage with clear skies and calm seas.</i></li>
+      </ul>
+    </ul>
+</div>
+
+  <div class="ozosection" id="ozobot">
+    <h2>Ozobot</h2>
+
+    <a href="https://www.youtube.com/watch?v=sn0qHkj6f9o">Ozoblockly tutorial</a>
+
+    <p>To use your Ozobot, simply connect it to a computer via USB or program it using “flashing.”</p>
+
+    <h3>Via USB</h3>
+    <p>To download via USB, you must:</p>
+
+    <p><b>1)</b> Connect your Ozobot to your PC with a USB cable. Make sure the connector matches the shape shown in Fig. 1.</p>
+    <div class="imgBlock"><img src="USBentery.jpg" alt="USB entry"></div>
+
+    <p><b>2)</b> Check if the model selected in Ozoblockly is “Bit+/Bit”. If it isn’t, you can change it by clicking “Bit+/Bit”.</p>
+    <div class="imgBlock"><img src="bitBit.png" alt="Bit+/Bit"></div>
+
+    <p><b>3)</b> Go to “Programs” and click “Connect”.</p>
+    <div class="imgBlock"><img src="Program.png" alt="Programs"></div>
+    <div class="imgBlock"><img src="Connect.png" alt="Connect"></div>
+
+    <p><b>4)</b> Then, in the pop-up window, select your Ozobot and click “Connect”. <b>(Pop-up windows do not work on Firefox and Safari.)</b></p>
+    <div class="imgBlock"><img src="popupwindow.png" alt="Popup window"></div>
+
+    <p><b>5)</b> Then click “Load Program” and your Ozobot is ready to use. Press the Ozobot button twice to run your program.</p>
+    <div class="imgBlock"><img src="LoadProgram.png" alt="Load program"></div>
+
+    <h3>Flashing</h3>
+    <p>When you open Ozoblockly, click “Flashing” and follow the on-screen instructions to download the program.</p>
+    <div class="imgBlock"><img src="Flashing.png" alt="Flashing"></div>
+    <div class="imgBlock"><img src="FlashingTuturial.png" alt="Flashing tutorial"></div>
+
+    <p><b>USB is the preferred method.</b></p>
+  </div>
+
+  <!-- Squares counter (sticky bottom) -->
+  <div class="squaresBar" id="squareCounter">
+    <div class="chip">Squares: <span id="sqNow">0</span></div>
+
+    <input id="spentInput" type="number" min="0" step="1" placeholder="Squares spent…" />
+    <button class="btn" id="applySpent" style="border-color:rgba(161,0,201,0.35);">Subtract</button>
+
+   </div>
+
+
+<script>
+  const sqNow = document.getElementById("sqNow");
+  const spentInput = document.getElementById("spentInput");
+  const applySpent = document.getElementById("applySpent");
+  const subtractLink = document.getElementById("subtractLink");
+
+  function render(){
+    sqNow.textContent = String(GAME.getSquares());
+  }
+
+  applySpent.addEventListener("click", ()=>{
+    const v = Number(spentInput.value);
+    if(Number.isFinite(v) && v > 0){
+      GAME.addSquares(-Math.floor(v));
+      spentInput.value = "";
+      render();
+    }
+  });
+
+  spentInput.addEventListener("keydown", (e)=>{
+    if(e.key === "Enter") applySpent.click();
+  });
+
+  subtractLink.addEventListener("click", ()=>{
+    setTimeout(()=> spentInput.focus(), 150);
+  });
+
+  window.addEventListener("storage", (ev)=>{
+    if(ev.key === GAME.keys.squares) render();
+  });
+
+  document.addEventListener("DOMContentLoaded", render);
+</script>
+
+
+</body>
+</html>

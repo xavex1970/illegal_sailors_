@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Illegal Sailors - Home</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script defer src="game.js"></script>
+</head>
+<body>
+
+<div class="snapWrap">
+
+  <!-- PART 1 -->
+  <section class="snap viewport" id="part1">
+    <video class="bgVideo" src="TelaInicial.mp4" autoplay muted loop playsinline></video>
+    <div class="bgOverlay"></div>
+
+    <div class="centerStack">
+      <div class="stack">
+        <h1 class="title">
+          Welcome to the Great Adventure of
+          <!-- CHANGE THE COLOR/STYLE OF THIS PART HERE -->
+          <span style="color:#FFD45A; font-weight:900;">Illegal Sailors</span>!
+        </h1>
+
+        <button class="btn" id="playBtn">PLAY</button>
+
+        <span class="pill">Tip: This page is split into two full-screen parts.</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- PART 2 -->
+  <section class="snap viewport" id="part2">
+    <video class="bgVideo" src="telaresumo.mp4" autoplay muted loop playsinline></video>
+    <div class="bgOverlay"></div>
+
+    <div class="centerStack">
+      <div class="stack">
+
+        <!-- Audio button image + hover text -->
+        <button class="btn hasTip audioImgBtn" id="audioBtn" aria-label="Play narration">
+          <span class="tooltip" style="background:#314e7d;color:#fff;">click me to read this for you</span>
+          <img class="inlineIcon" src="botaoAudio.jpg" alt="Audio button" />
+        </button>
+
+        <audio id="resumeAudio" src="resume.m4a"></audio>
+
+
+        <h2 class="title">Set sail on an unforgettable journey across the Atlantic Ocean!</h2>
+
+        <p class="text">
+          In this board game, players become illegal Portuguese sailors in search of the prized codfish
+          in distant Norwegian waters, but the sea won’t make things easy. You’ll face fierce storms,
+          polluted areas, coast guard patrols, and even unexpected encounters with pirates. To move forward,
+          you’ll need to think strategically, coordinate your boat (the Ozobot) along the coast, and reflect
+          on the real-world consequences of illegal fishing. Only the most resourceful and determined crews
+          will make it to their destination. The Illegal Sailors combines fun, strategy, and awareness — a game
+          that makes you think about how our choices can impact the ocean and those who depend on it.
+        </p>
+
+        <div class="twoCols">
+
+          <a class="btn cardBtn hasTip" href="ozobot.html" target="_blank" rel="noopener">
+            <span class="tooltip" style="background:#DEDEFF;color:#A100C9;">(click here to learn how to play)</span>
+            <img class="inlineIcon" src="ozobot.jpg" alt="Ozobot" />
+            <span class="cardLabel">
+              <span class="title" style="padding:6px 10px; font-size:18px;">Ozobot and rules</span>
+              <span class="text" style="background:transparent; padding:0;">Learn how to move and track squares.</span>
+            </span>
+          </a>
+
+          <a class="btn cardBtn hasTip" href="questions.html" target="_blank" rel="noopener">
+            <span class="tooltip" style="background:#C5E8D5;color:#000;">(click when you reach marked spots)</span>
+            <img class="inlineIcon" src="questionMark.jpg" alt="Questions" />
+            <span class="cardLabel">
+              <span class="title" style="padding:6px 10px; font-size:18px;">Questions</span>
+              <span class="text" style="background:transparent; padding:0;">Pollution, Marine Guard, European Sturgeon.</span>
+            </span>
+          </a>
+
+        </div>
+
+        <!-- Hidden “The End” button (only shows after European Sturgeon is completed) -->
+        <a class="btn hiddenEndBtn" id="theEndBtn" href="theend.html" target="_blank" rel="noopener" style="display:none;">
+  The End
+</a>
+
+
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+  // PLAY scroll to part 2
+  document.getElementById("playBtn").addEventListener("click", ()=>{
+    document.getElementById("part2").scrollIntoView({behavior:"smooth"});
+  });
+
+  // Audio: click toggles playback
+  const audio = document.getElementById("resumeAudio");
+  document.getElementById("audioBtn").addEventListener("click", ()=>{
+    if(audio.paused){
+      audio.play();
+    }else{
+      audio.pause();
+      audio.currentTime = 0;
+    }
+  });
+
+  // Show "The End" only after sturgeon is done
+  document.addEventListener("DOMContentLoaded", ()=>{
+    const done = localStorage.getItem("end_unlocked") === "true";
+    const btn = document.getElementById("theEndBtn");
+    if(done){
+      btn.classList.add("show");
+    }else{
+      btn.style.display = "none";
+    }
+
+    window.addEventListener("storage", (ev)=>{
+      if(ev.key === "end_unlocked"){
+        const now = localStorage.getItem("sturgeon_done") === "true";
+        if(now){
+          btn.style.display = "";
+          btn.classList.add("show");
+        }
+      }
+    });
+  });
+</script>
+
+</body>
+</html>

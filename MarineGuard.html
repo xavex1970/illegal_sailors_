@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Illegal Sailors - Marine Guard</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script defer src="game.js"></script>
+</head>
+<body class="marineGuardPage">
+
+<div class="viewport">
+  <img class="bgImage" src="Marineguardreal.jpg" alt="Marine Guard background" />
+  <div class="bgOverlay" style="background:rgba(0,0,0,0.10);"></div>
+
+  <div class="centerStack">
+    <div class="stack" style="align-items:center;">
+
+      <div class="mgTopBar" id="mgTopBar" style="display:none;">
+        <div class="counterChip">Time: <span id="timeLeft">2:00</span></div>
+        <div class="counterChip">
+          Squares: <span id="sqEarned">0.0</span>
+          <span class="smallPlus" id="plusHint" style="display:none;">+0.5</span>
+        </div>
+      </div>
+
+      <div class="bubble" id="bubble">
+        <p>Hello, I’m from the Marine Guard.</p>
+        <p>Before you continue, I’ll need to ask you a few questions to make sure you’re not illegal fishers.</p>
+      </div>
+
+      <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:center;">
+        <button class="btn" id="nextBtn">Next</button>
+        <button class="btn" id="yesBtn" style="display:none;">Yes</button>
+        <button class="btn" id="noBtn" style="display:none;">No</button>
+      </div>
+
+      <div class="bubble" id="quizBox" style="display:none;">
+        <p id="qText" style="font-weight:800; margin-bottom:10px;">Question</p>
+        <div id="options" style="display:flex; flex-direction:column; gap:10px;"></div>
+        <p id="wrongMsg" style="color:#c40000; font-weight:800; margin:10px 0 0; display:none;">Wrong</p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Time finished overlay -->
+  <div class="overlay" id="timeOverlay">
+    <div class="dim30"></div>
+    <div class="panel timePanel">
+      <h2 style="margin:0 0 8px 0; font-weight:900;">Time finished.</h2>
+      <p style="margin:0 0 10px 0; font-weight:800;">Number of squares received:</p>
+      <p style="margin:0 0 14px 0; font-size:34px; font-weight:900;" id="finalSquares">0</p>
+      <a class="btn" href="questions.html" target="_blank" rel="noopener">Back to Questions</a>
+    </div>
+  </div>
+
+</div>
+
+
+
+<script>
+  // ===== Questions =====
+  const QUESTIONS = [
+    { q:"One of the main environmental consequences of illegal fishing is:", opts:["A) Increase in biodiversity","B) Improvement of marine habitats","C) Reduction of fish stocks","D) Growth of artificial reefs"], correct:2 },
+    { q:"Illegal fishing harms marine ecosystems because it:", opts:["A) Respects closed seasons","B) Uses only selective fishing gear","C) Exploits species without scientific control","D) Protects endangered species"], correct:2 },
+    { q:"Illegal fishing can lead to:", opts:["A) Rapid recovery of species","B) Growth of tourism","C) Collapse of fish populations","D) Improvement of water quality"], correct:2 },
+    { q:"A direct impact of illegal fishing on habitats is:", opts:["A) Creation of new marine areas","B) Destruction of seabed habitats","C) Reduction of pollution","D) Coastal reforestation"], correct:1 },
+    { q:"Illegal fishing contributes to species extinction because it:", opts:["A) Increases inspection","B) Reduces catches","C) Does not respect catch limits","D) Protects juvenile fish"], correct:2 },
+
+    { q:"Illegal fishing causes economic losses because it:", opts:["A) Increases taxes","B) Creates unfair competition","C) Increases the value of legal fish","D) Improves income for legal fishers"], correct:1 },
+    { q:"Fishers who follow the law are affected because they:", opts:["A) Sell more fish","B) Receive more support","C) Cannot compete with illegal low prices","D) Get higher subsidies"], correct:2 },
+    { q:"Illegal fishing reduces government revenue due to:", opts:["A) Higher exports","B) Non-payment of licences and fees","C) Job creation","D) Tourism growth"], correct:1 },
+    { q:"An indirect economic consequence is:", opts:["A) Expansion of the legal fleet","B) Sustainable growth","C) Instability in the fishing sector","D) Improvement of fair trade"], correct:2 },
+    { q:"The entry of illegal fish into the market causes:", opts:["A) Fairer prices","B) Market distortion","C) Better food quality","D) Greater transparency"], correct:1 },
+
+    { q:"Illegal fishing affects coastal communities because it:", opts:["A) Creates new jobs","B) Reduces legal employment opportunities","C) Improves living conditions","D) Increases schooling"], correct:1 },
+    { q:"In the long term, illegal fishing can cause:", opts:["A) Population growth","B) Youth retention","C) Poverty in fishing communities","D) Increased public investment"], correct:2 },
+    { q:"A decrease in available fish can lead to:", opts:["A) Food surplus","B) Food insecurity","C) Reduction of poverty","D) Higher meat consumption"], correct:1 },
+    { q:"Illegal fishing affects most severely:", opts:["A) Industrialised countries","B) Landlocked regions","C) Communities dependent on fishing","D) Urban areas"], correct:2 },
+    { q:"A frequent social consequence is:", opts:["A) Fewer conflicts","B) Greater equality","C) Increased social tensions","D) Reduced migration"], correct:2 },
+
+    { q:"Illegal fishing makes sustainable management difficult because it:", opts:["A) Uses scientific data","B) Does not report real catches","C) Respects quotas","D) Cooperates with authorities"], correct:1 },
+    { q:"Illegal fishing is problematic because it:", opts:["A) Is authorised","B) Is fully controlled","C) Violates national and international laws","D) Promotes sustainability"], correct:2 },
+    { q:"The European Union combats illegal fishing through:", opts:["A) Reduced inspections","B) Catch certification systems","C) Removal of rules","D) Encouraging unlimited fishing"], correct:1 },
+    { q:"Lack of control over illegal fishing leads to:", opts:["A) Better governance","B) Environmental protection","C) Poor management of marine resources","D) Fish abundance"], correct:2 },
+    { q:"Illegal fishing compromises:", opts:["A) Only the present","B) The future of fisheries","C) Only tourism","D) Only industry"], correct:1 },
+
+    { q:"Illegal fishing increases bycatch of:", opts:["A) Marine plants","B) Non-target species","C) Microalgae","D) Rocks"], correct:1 },
+    { q:"Protected species are affected because they:", opts:["A) Are well controlled","B) Are always released","C) Are illegally caught","D) Are outside fishing gear"], correct:2 },
+    { q:"Illegal fishing can cause:", opts:["A) Ecological balance","B) Disruption of food chains","C) Sustainable growth","D) Ecosystem recovery"], correct:1 },
+    { q:"Abandoned fishing nets cause:", opts:["A) Environmental benefits","B) Wildlife protection","C) Continuous animal mortality","D) Natural recycling"], correct:2 },
+    { q:"Loss of marine biodiversity results from:", opts:["A) Sustainable fishing","B) Excessive illegal exploitation","C) Environmental protection","D) Scientific research"], correct:1 },
+
+    { q:"Illegal fishing is often associated with:", opts:["A) Maritime tourism","B) Organised crime","C) Environmental education","D) Scientific research"], correct:1 },
+    { q:"Illegal fishing weakens:", opts:["A) International cooperation","B) Science","C) State authority","D) Environmental protection"], correct:2 },
+    { q:"Insufficient enforcement contributes to:", opts:["A) Fewer offences","B) Continuation of illegal fishing","C) Sustainability","D) Stock recovery"], correct:1 },
+    { q:"Illegal fishing threatens:", opts:["A) Only the environment","B) Only the economy","C) Environment, economy and society","D) Only trade"], correct:2 },
+    { q:"Combating illegal fishing requires:", opts:["A) Individual action only","B) Fewer laws","C) National and international cooperation","D) Elimination of fishing"], correct:2 }
+  ];
+
+  // ===== Elements (match your HTML) =====
+  const bubble = document.getElementById("bubble");
+  const nextBtn = document.getElementById("nextBtn");
+  const yesBtn = document.getElementById("yesBtn");
+  const noBtn = document.getElementById("noBtn");
+
+  const topBar = document.getElementById("mgTopBar");
+  const timeLeft = document.getElementById("timeLeft");
+  const sqEarned = document.getElementById("sqEarned");
+  const plusHint = document.getElementById("plusHint");
+
+  const quizBox = document.getElementById("quizBox");
+  const qText = document.getElementById("qText");
+  const options = document.getElementById("options");
+  const wrongMsg = document.getElementById("wrongMsg");
+
+  const timeOverlay = document.getElementById("timeOverlay");
+  const finalSquares = document.getElementById("finalSquares");
+
+  const backBtn = timeOverlay.querySelector('a.btn');
+
+  // ===== Intro flow =====
+  // States:
+  // intro1 -> askKnowRules -> (yes path) readyYes -> quiz
+  // intro1 -> askKnowRules -> (no path) rules1 -> rules2 -> rules3 (needs YES) -> readyNo -> quiz
+  let state = "intro1";
+
+  function showBubble(html){
+    bubble.innerHTML = html;
+  }
+
+  function showNext(){
+    nextBtn.style.display = "inline-flex";
+    yesBtn.style.display = "none";
+    noBtn.style.display = "none";
+  }
+
+  function showYesNo(){
+    nextBtn.style.display = "none";
+    yesBtn.style.display = "inline-flex";
+    noBtn.style.display = "inline-flex";
+    yesBtn.textContent = "Yes";
+    noBtn.textContent = "No";
+  }
+
+  function showOnlyYes(){
+    nextBtn.style.display = "none";
+    yesBtn.style.display = "inline-flex";
+    noBtn.style.display = "none";
+    yesBtn.textContent = "Yes";
+  }
+
+  function startIntro(){
+    showBubble(
+      "<p>Hello, I'm from the Marine Guard.</p>" +
+      "<p>Before you continue, I'll need to ask you a few questions to make sure you're not illegal fishers.</p>"
+    );
+    showNext();
+    state = "intro1";
+  }
+
+  nextBtn.addEventListener("click", ()=>{
+    if(state === "intro1"){
+      state = "askKnowRules";
+      showBubble("<p>Do you already know the rules?</p>");
+      showYesNo();
+      return;
+    }
+
+    if(state === "rules1"){
+      state = "rules2";
+      showBubble("<p>Each correct answer gives you access to a half square. At the end of the time you will receive the number of squares you achieve.</p>");
+      showNext();
+      return;
+    }
+
+    if(state === "rules2"){
+      state = "rules3";
+      showBubble("<p>But attention, decimal numbers are not counted, so you don't get 1.5 squares, you get 1 square.</p>");
+      showOnlyYes(); // you asked for YES here
+      return;
+    }
+
+    if(state === "readyNo"){
+      beginQuiz();
+      return;
+    }
+  });
+
+  yesBtn.addEventListener("click", ()=>{
+    if(state === "askKnowRules"){
+      state = "readyYes";
+      showBubble("<p>Good.</p><p>Ready?</p>");
+      showOnlyYes(); // start quiz on YES
+      return;
+    }
+
+    if(state === "rules3"){
+      state = "readyNo";
+      showBubble("<p>Ready?</p>");
+      showNext();
+      return;
+    }
+
+    if(state === "readyYes"){
+      beginQuiz();
+      return;
+    }
+  });
+
+  noBtn.addEventListener("click", ()=>{
+    if(state === "askKnowRules"){
+      state = "rules1";
+      showBubble("<p>The rules are simple.</p><p>You have 2 minutes to answer various multiple choice questions.</p>");
+      showNext();
+    }
+  });
+
+  // ===== Quiz logic =====
+  let seconds = 120;
+  let earned = 0;
+  let timer = null;
+  let idx = 0;
+
+  function fmt(sec){
+    const m = Math.floor(sec/60);
+    const s = sec % 60;
+    return `${m}:${String(s).padStart(2,"0")}`;
+  }
+
+  function getStartIndex(){
+    const last = Number(localStorage.getItem(GAME.keys.marineLast));
+    if(Number.isFinite(last) && last >= 0){
+      return (last + 1) % QUESTIONS.length;
+    }
+    return 0;
+  }
+
+  function beginQuiz(){
+    // hide intro controls + show quiz layout
+    nextBtn.style.display = "none";
+    yesBtn.style.display = "none";
+    noBtn.style.display = "none";
+    bubble.style.display = "none";
+
+    quizBox.style.display = "block";
+    topBar.style.display = "flex";
+
+    // reset counters
+    seconds = 120;
+    earned = 0;
+    idx = getStartIndex();
+
+    timeLeft.textContent = fmt(seconds);
+    sqEarned.textContent = earned.toFixed(1);
+    plusHint.style.display = "none";
+
+    renderQuestion();
+
+    if(timer) clearInterval(timer);
+    timer = setInterval(()=>{
+      seconds--;
+      timeLeft.textContent = fmt(Math.max(0, seconds));
+      if(seconds <= 0){
+        finish();
+      }
+    }, 1000);
+  }
+
+  function renderQuestion(){
+    wrongMsg.style.display = "none";
+    options.innerHTML = "";
+
+    const q = QUESTIONS[idx];
+    qText.textContent = q.q;
+
+    q.opts.forEach((t, i)=>{
+      const b = document.createElement("button");
+      b.className = "btn optBtn";
+      b.type = "button";
+      b.textContent = t;
+      b.addEventListener("click", ()=> choose(i));
+      options.appendChild(b);
+    });
+  }
+
+  function choose(choice){
+    const q = QUESTIONS[idx];
+
+    if(choice === q.correct){
+      earned += 0.5;
+      sqEarned.textContent = earned.toFixed(1);
+      plusHint.style.display = "inline";
+      setTimeout(()=> plusHint.style.display = "none", 600);
+    }else{
+      wrongMsg.style.display = "block";
+      setTimeout(()=> wrongMsg.style.display = "none", 550);
+    }
+
+    // store last question index so next visit starts after it
+    localStorage.setItem(GAME.keys.marineLast, String(idx));
+
+    idx = (idx + 1) % QUESTIONS.length;
+    renderQuestion();
+  }
+
+  function finish(){
+    if(timer){ clearInterval(timer); timer = null; }
+
+    // decimals are not counted -> floor
+    const received = Math.floor(earned);
+    GAME.addSquares(received);
+
+    finalSquares.textContent = String(received);
+    timeOverlay.classList.add("show");
+  }
+
+  // The "Back to Questions" button is already an anchor opening a new tab.
+  backBtn.addEventListener("click", ()=>{
+    // let the link open; close current tab if browser allows
+    setTimeout(()=> window.close(), 100);
+  });
+
+  // Init
+  document.addEventListener("DOMContentLoaded", startIntro);
+</script>
+
+</body>
+</html>
