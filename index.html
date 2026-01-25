@@ -25,8 +25,6 @@
         </h1>
 
         <button class="btn" id="playBtn">PLAY</button>
-
-        <span class="pill">Tip: This page is split into two full-screen parts.</span>
       </div>
     </div>
   </section>
@@ -123,7 +121,7 @@
 
     window.addEventListener("storage", (ev)=>{
       if(ev.key === "end_unlocked"){
-        const now = localStorage.getItem("end_unlocked") === "true";
+        const now = localStorage.getItem("sturgeon_done") === "true";
         if(now){
           btn.style.display = "";
           btn.classList.add("show");

@@ -354,6 +354,7 @@ body{
   padding:14px 16px;
   width:min(620px, 88vw);
   text-align:left;
+  font-size:15px; 
 }
 
 .bubble p{ margin:0 0 10px 0; }
