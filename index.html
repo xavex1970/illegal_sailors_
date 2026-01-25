@@ -123,7 +123,7 @@
 
     window.addEventListener("storage", (ev)=>{
       if(ev.key === "end_unlocked"){
-        const now = localStorage.getItem("sturgeon_done") === "true";
+        const now = localStorage.getItem("end_unlocked") === "true";
         if(now){
           btn.style.display = "";
           btn.classList.add("show");
