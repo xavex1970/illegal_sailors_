@@ -24,6 +24,20 @@ body{
   background:#000;
 }
 
+.siteHeader{
+  position: absolute;   /* ou fixed se quiseres sempre visível */
+  top: 16px;
+  left: 16px;
+  z-index: 9999;
+}
+
+.logoImg{
+  height: 48px;         /* ajusta o tamanho aqui */
+  width: auto;
+  display: block;
+}
+
+
 /* Layout helpers */
 .viewport{
   height:100vh;
